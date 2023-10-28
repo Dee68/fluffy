@@ -6,14 +6,20 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class BankingApp {
+    // ANSI escape code constants for text colors
+    static final String RESET = "\u001B[0m";
+    static final String RED = "\u001B[31m";
+    static final String GREEN = "\u001B[32m";
+    static final String YELLOW = "\u001B[33m";
     public static void main(String[] args) throws Exception{
         // Press Alt+Enter with your caret at the highlighted text to see how
         // IntelliJ IDEA suggests fixing it.
-        System.out.println("""
+
+        System.out.println(GREEN+"""
                ===================================
                 WELCOME TO BANK MANAGEMENT SYSTEM
                ===================================
-                    """);
+                    """+RESET);
 
         do{
             System.out.println("Do you want to continue?(Q) to quit: ");
@@ -51,6 +57,121 @@ public class BankingApp {
         return Math.abs(num);
    }
 
+    //swap object of BankAccount
+    public static void swap(ArrayList<BankAccount> accounts, int x, int y){
+        BankAccount temp = accounts.get(x);
+        accounts.set(x,accounts.get(y));
+        accounts.set(y,temp);
+    }
+
+    //bubble sort
+    public  static void bubbleSortAccount(ArrayList<BankAccount> accounts){
+        int n = accounts.size();
+        boolean swapped;
+        for (int i = 0; i < n; i++) {
+            swapped = false;
+            for (int j = 0; j < n-i-1; j++) {
+                if (accounts.get(j).getBalance() > accounts.get(j+1).getBalance()){
+                    swap(accounts,j,j+1);
+                    swapped = true;
+                }
+            }
+            if (!swapped){
+                break;
+            }
+
+        }
+
+
+    }
+
+    //selection sort
+    public static void selectionSort(ArrayList<BankAccount> accounts){
+        int n = accounts.size();
+
+        for (int i = 0; i < n; i++){
+            int index = i;
+
+            for (int j = i + 1; j < n; j++){
+                if (accounts.get(j).getBalance() < accounts.get(index).getBalance()){
+                    index = j;
+                }
+            }
+
+            swap(accounts,index,i);
+        }
+    }
+
+    //insertion sort
+    public static void insertionSort(ArrayList<BankAccount> accounts){
+        int n = accounts.size();
+        for (int i = 1; i < n; i++){
+            BankAccount key = accounts.get(i);
+            int j = i - 1;
+            while (j >= 0 && accounts.get(j).getBalance() > key.getBalance()){
+                //arr[j + 1] = arr[j];
+                swap(accounts, j+1,j);
+                j--;
+            }
+            accounts.set(j+1,key);
+        }
+    }
+
+    // merge sort
+    public static ArrayList<BankAccount> mergeSort(ArrayList<BankAccount> ar)
+    {
+        if (ar.size() <= 1) return ar;
+
+        ArrayList<BankAccount> left, right;
+        left = new ArrayList<BankAccount>();
+        right = new ArrayList<BankAccount>();
+
+        for (int i = 0; i < ar.size(); i++)
+        {
+            if (i % 2 != 0) left.add(ar.get(i));
+            else right.add(ar.get(i));
+        }
+
+        left = mergeSort(left);
+        right = mergeSort(right);
+
+        return merge(left, right);
+    }
+
+    //
+    private static ArrayList<BankAccount> merge(ArrayList<BankAccount> left, ArrayList<BankAccount> right)
+    {
+        ArrayList<BankAccount> ret = new ArrayList<BankAccount>();
+
+        while (!left.isEmpty() && !right.isEmpty())
+        {
+            if (left.get(0).getBalance() <= right.get(0).getBalance())
+            {
+                ret.add(left.get(0));
+                left.remove(0);
+            }
+            else
+            {
+                ret.add(right.get(0));
+                right.remove(0);
+            }
+        }
+
+        while (!left.isEmpty())
+        {
+            ret.add(left.get(0));
+            left.remove(0);
+        }
+
+        while (!right.isEmpty())
+        {
+            ret.add(right.get(0));
+            right.remove(0);
+        }
+
+        return ret;
+    }
+
     public static void accounts(){
         int accountCount = numAccount();
         ArrayList<BankAccount> accounts = new ArrayList<BankAccount>();
@@ -67,6 +188,24 @@ public class BankingApp {
                 throw new RuntimeException(e);
             }
         }
+        //display accounts before sorting
+        for (BankAccount account:accounts) {
+            System.out.println("Accounts before sorting: ");
+            System.out.println(account);
+        }
+        //after sorting
+        bubbleSortAccount(accounts);
+        //selectionSort(accounts);
+        //insertionSort(accounts);
+        for (BankAccount account:accounts) {
+            System.out.println("Accounts after sorting: ");
+            System.out.println(account);
+        }
+        //merge sort
+//        for (BankAccount account:mergeSort(accounts)) {
+//            System.out.println("Accounts after sorting: ");
+//            System.out.println(account);
+//        }
         //print to text file(arraylist of accounts
         try {
             File sfile = new File("accounts.txt");
